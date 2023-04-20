@@ -7,6 +7,8 @@ spring:
       username: root
       password: pass
       database: pedidos_db
+  application:
+    name: pedido-api
 
 server:
   port: 8081
