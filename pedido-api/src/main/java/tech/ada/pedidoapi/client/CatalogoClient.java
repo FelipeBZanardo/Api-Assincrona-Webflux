@@ -19,7 +19,7 @@ public class CatalogoClient {
 
     public CatalogoClient(WebClient.Builder clientBuilder, ObjectMapper mapper) {
         this.client = clientBuilder
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://localhost:8080")
                 .build();
         this.mapper = mapper;
     }
@@ -45,7 +45,7 @@ public class CatalogoClient {
                     if (result.statusCode().is2xxSuccessful())
                         return result.bodyToMono(Produto.class);
                     else
-                        return Mono.error(new RuntimeException("Erro na busca do catálogo"));
+                        return Mono.error(new RuntimeException("Erro na busca do catálogo. Produto não existe - " + id));
 
                 });
     }
@@ -67,7 +67,7 @@ public class CatalogoClient {
                         log.info("Estoque do produto atualizado com sucesso - {}", id);
                         return result.bodyToMono(Produto.class);
                     }
-                    return Mono.error(new RuntimeException("Erro na chamada"));
+                    return Mono.error(new RuntimeException("Erro na chamada da api de catálogo. Produto não existe"));
                 });
     }
 }

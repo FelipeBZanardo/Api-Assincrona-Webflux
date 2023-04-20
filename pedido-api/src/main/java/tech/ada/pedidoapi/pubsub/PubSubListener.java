@@ -12,6 +12,7 @@ import tech.ada.pedidoapi.model.Status;
 import tech.ada.pedidoapi.repository.PedidoRepository;
 import tech.ada.pedidoapi.service.PedidoService;
 
+import java.time.Duration;
 import java.time.Instant;
 
 
@@ -22,20 +23,17 @@ public class PubSubListener implements InitializingBean {
 
     private final Sinks.Many<PubSubMessage> sink;
     private final PedidoRepository pedidoRepository;
-    private final PedidoService pedidoService;
     private final CatalogoClient client;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         sink.asFlux()
-                //.delayElements(Duration.ofSeconds(5))
+                .delayElements(Duration.ofSeconds(5))
                 .subscribe(
                         next -> {
                             log.info("Iniciando listener onNext -{}", next);
                             pedidoRepository.findById(next.pedido().getId())
                                     .publishOn(Schedulers.boundedElastic())
-                                    .flatMap(pedidoService::atualizarStatus)
-                                    .flatMap(pedidoService::atualizarValor)
                                     .flatMap(pedido -> {
                                         log.info("Verificando Status do Pedido - {}", pedido);
                                         if(pedido.getStatus().equals(Status.REALIZADO)){

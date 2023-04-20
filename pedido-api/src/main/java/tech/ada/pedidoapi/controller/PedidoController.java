@@ -24,9 +24,8 @@ public class PedidoController {
     @PostMapping
     public Mono<Pedido> efetuarPedido(@RequestBody PedidoRequest pedidoRequest){
         return Mono.defer(() -> pedidoService.efetuarPedido(pedidoRequest.itens()))
-                .delayElement(Duration.ofSeconds(1))
-                .flatMap(pedidoService::atualizarValor)
-                .flatMap(pullPagamentosComponent::pullNewPedido);
+                .flatMap(pullPagamentosComponent::pullNewPedido)
+                .subscribeOn(Schedulers.parallel());
     }
 
     @GetMapping
